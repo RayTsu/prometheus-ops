@@ -1,0 +1,15 @@
+# install grafana on centos
+
+- name: mkdir dir /app if not exists
+  file: name=/app state=directory
+
+- name: transfer grafana-5.3.1-1.x86_64.rpm to dest server
+  copy: src=/test/Prometheus/grafana-5.3.1-1.x86_64.rpm dest=/app
+
+- name: install grafana-5.3.1-1.x86_64.rpm
+  shell: |
+          cd /app
+          yum localinstall grafana-5.3.1-1.x86_64.rpm -y
+
+- name: start grafana-server service and enable auto start
+  shell: systemctl daemon-reload; systemctl start grafana-server.service; systemctl enable grafana-server.service

@@ -1,0 +1,27 @@
+# install alertmanager on centos
+
+- name: mkdir dir /app if not exists
+  file: name=/app state=directory
+
+- name: transfer alertmanager-0.15.2.linux-amd64.tar.gz to dest server
+  copy: src=/test/Prometheus/alertmanager-0.15.2.linux-amd64.tar.gz dest=/app
+
+- name: unarchive lertmanager-0.15.2.linux-amd64.tar.gz
+  shell: |
+          cd /app
+          tar zxvf alertmanager-0.15.2.linux-amd64.tar.gz
+
+- name: rename alertmanager-0.15.2.linux-amd64 to alertmanager_dir,create alertmanager_db directory
+  shell: |
+          cd /app
+          mv alertmanager-0.15.2.linux-amd64 alertmanager_dir
+          mkdir -p alertmanager_dir/alertmanager_db
+
+- name: transfer alertmanager.yml to alertmanager_dir/
+  copy: src=alertmanager.yml dest=/app/alertmanager_dir
+
+- name: transfer alertmanager.service to dest server
+  template: src=alertmanager.service dest=/etc/systemd/system
+
+- name: start alertmanager service and enable auto start
+  shell: systemctl daemon-reload; systemctl start alertmanager.service; systemctl enable alertmanager.service

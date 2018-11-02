@@ -1,0 +1,35 @@
+# install prometheus on centos
+
+- name: mkdir dir /app if not exists
+  file: name=/app state=directory
+
+- name: transfer prometheus-2.4.3.linux-amd64.tar.gz to dest server
+  copy: src=/test/Prometheus/prometheus-2.4.3.linux-amd64.tar.gz dest=/app
+
+- name: unarchive prometheus-2.4.3.linux-amd64.tar.gz
+  shell: |
+          cd /app
+          tar zxvf prometheus-2.4.3.linux-amd64.tar.gz
+
+- name: prepare prometheus related dir
+  shell: |
+          cd /app
+          mv prometheus-2.4.3.linux-amd64 prometheus_dir
+          mkdir -p prometheus_dir/prometheus_db
+
+- name: transfer prometheus.yml to prometheus_dir/
+  template: src=prometheus.yml dest=/app/prometheus_dir
+
+- name: transfer alert.rules to prometheus_dir/
+  copy: src=alert.rules dest=/app/prometheus_dir
+
+- name: transfer prometheus.service to dest server
+  template: src=prometheus.service dest=/etc/systemd/system
+  when: ansible_distribution == "CentOS"
+
+- name: transfer prometheus.service to dest server
+  template: src=prometheus.service dest=/etc/systemd/system
+
+- name: start prometheus service and enable auto start
+  shell: systemctl daemon-reload; systemctl start prometheus.service; systemctl enable prometheus.service
+  when: ansible_distribution == "CentOS"

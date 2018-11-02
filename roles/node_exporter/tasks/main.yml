@@ -1,0 +1,34 @@
+# install node_exporter
+
+- name: mkdir dir /app if not exists
+  file: name=/app state=directory
+
+- name: transfer node_exporter-0.16.0.linux-amd64.tar.gz to dest server
+  copy: src=/test/Prometheus/node_exporter-0.16.0.linux-amd64.tar.gz dest=/app
+
+- name: unarchive node_exporter-0.16.0.linux-amd64.tar.gz
+  shell: |
+          cd /app
+          tar zxvf node_exporter-0.16.0.linux-amd64.tar.gz
+
+- name: prepare node_exporter related dir
+  shell: |
+          cd /app
+          mv node_exporter-0.16.0.linux-amd64 node_exporter_dir
+
+- name: transfer node_exporter.service to dest server
+  template: src=node_exporter.service dest=/etc/systemd/system
+  when: ansible_distribution == "CentOS"
+
+- name: start node_exporter service and enable auto start
+  shell: systemctl daemon-reload; systemctl start node_exporter.service; systemctl enable node_exporter.service
+  when: ansible_distribution == "CentOS"
+
+- name: transfer node-exporter to dest server
+  template: src=node-exporter dest=/etc/init.d
+            owner=root mode=0755
+  when: ansible_distribution == "RedHat"
+
+- name: start node-exporter service and enable auto start
+  shell: service node-exporter start; chkconfig --add node-exporter; chkconfig --level 35 node-exporter on
+  when: ansible_distribution == "RedHat"

@@ -1,0 +1,23 @@
+[prometheus-server]
+192.168.11.73
+[consul-server]
+192.168.11.73
+[grafana-server]
+192.168.11.73
+[alertmanager-server]
+192.168.11.73
+[docker-registry]
+192.168.11.53 node_ip="192.168.11.53" env="sit" name="docker-registry"
+[nginx]
+192.168.11.193 node_ip="192.168.11.193" env="sit" name="nginx"
+[ansible-server]
+192.168.11.50 node_ip="192.168.11.50" env="sit" name="ansible-server"
+[jenkins-master]
+192.168.11.52 node_ip="192.168.11.52" env="sit" name="jenkins-master"
+[jenkins-slave]
+192.168.11.51 node_ip="192.168.11.51" env="sit" name="jenkins-slave"
+192.168.10.73 node_ip="192.168.10.73" env="sit" name="jenkins-slave"
+[all:vars]
+prometheus_server="192.168.11.73"
+alertmanager_server="192.168.11.73"
+consul_server="192.168.11.73"

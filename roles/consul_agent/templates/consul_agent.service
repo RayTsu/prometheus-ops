@@ -1,0 +1,10 @@
+[Unit]
+Description=consul agent - For Service Discovery And Service Registry
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/app/consul_dir/consul agent -node=agent-{{node_ip}} -data-dir=/app/consul_dir/consul_data -pid-file=/app/consul_dir/consul.pid -config-dir=/app/consul_dir/consul.d -datacenter=hemei -client=0.0.0.0 -bind={{node_ip}} -join={{consul_server}}
+
+[Install]
+WantedBy=multi-user.target

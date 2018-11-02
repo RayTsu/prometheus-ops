@@ -1,0 +1,50 @@
+#chkconfig: - 85 15
+#description: consul-agent is a service to start consul agent
+
+#!/bin/sh
+CONSUL_PATH=/app/consul_dir
+start() {
+  echo "Starting consul_agent"
+  nohup $CONSUL_PATH/consul agent -node=agent-{{node_ip}} -data-dir=$CONSUL_PATH/consul_data -pid-file=$CONSUL_PATH/consul.pid -config-dir=$CONSUL_PATH/consul.d -datacenter=hemei -client=0.0.0.0 -bind={{node_ip}} -join={{consul_server}} > $CONSUL_PATH/consul.log 2>&1 &
+}
+stop() {
+  local PID
+  echo "Stopping consul_agent"
+  PID=$(ps -ef|grep consul_dir|grep -v grep|awk '{print $2}')
+  kill -9 $PID
+  echo "$PID killed"
+}
+status() {
+ status_count=`ps -ef|grep consul_dir|grep -v grep|wc -l`
+ if [[ $status_count -eq 1 || $status_count -gt 1 ]];then
+  echo "consul_agent is running"
+  exit 0
+ else
+  echo "consul_agent is not running"  
+ fi
+}
+usage() {
+  echo "Usage: $(basename $0) start|status|stop|restart"
+}
+case "$1" in
+  start)
+ start
+  ;;
+  stop)
+ stop
+  ;;
+  restart)
+ stop
+ sleep 5
+ start
+  ;;
+  status)
+ status
+  ;;
+  *)
+ usage && exit 1
+    ;;
+esac    
+
+
+

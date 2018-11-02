@@ -1,0 +1,38 @@
+# install consul_agent
+
+- name: mkdir dir /app if not exists
+  file: name=/app state=directory
+
+- name: transfer consul_1.3.0_linux_amd64.zip to dest server
+  copy: src=/test/Prometheus/consul_1.3.0_linux_amd64.zip dest=/app
+
+- name: unarchive consul_1.3.0_linux_amd64.zip
+  shell: |
+          cd /app
+          unzip consul_1.3.0_linux_amd64.zip
+
+- name: prepare consul related dir
+  shell: |
+          cd /app
+          mkdir -p consul_dir consul/consul_data consul_dir/consul.d
+          mv consul consul_dir/
+
+- name: transfer node-exporter.json to consul.d/
+  template: src=node-exporter.json dest=/app/consul_dir/consul.d
+
+- name: transfer consul_agent.service to dest server
+  template: src=consul_agent.service dest=/etc/systemd/system
+  when: ansible_distribution == "CentOS"
+
+- name: start consul_agent service and enable auto start
+  shell: systemctl daemon-reload; systemctl start consul_agent.service; systemctl enable consul_agent.service
+  when: ansible_distribution == "CentOS"
+
+- name: transfer consul-agent to dest server
+  template: src=consul-agent dest=/etc/init.d
+            owner=root mode=0755
+  when: ansible_distribution == "RedHat"
+
+- name: start consul-agent service and enable auto start
+  shell: service consul-agent start; chkconfig --add consul-agent; chkconfig --level 35 consul-agent on
+  when: ansible_distribution == "RedHat"

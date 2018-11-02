@@ -1,0 +1,65 @@
+# my global config
+global:
+  scrape_interval:     15s # Set the scrape interval to every 15 seconds. Default is every 1 minute.
+  evaluation_interval: 15s # Evaluate rules every 15 seconds. The default is every 1 minute.
+  # scrape_timeout is set to the global default (10s).
+
+# Alertmanager configuration
+alerting:
+  alertmanagers:
+  - static_configs:
+    - targets:
+      - {{alertmanager_server}}:9093
+
+# Load rules once and periodically evaluate them according to the global 'evaluation_interval'.
+rule_files:
+  - "alert.rules"
+  # - "second_rules.yml"
+
+# A scrape configuration containing exactly one endpoint to scrape:
+# Here it's Prometheus itself.
+scrape_configs:
+  # The job name is added as a label `job=<job_name>` to any timeseries scraped from this config.
+  - job_name: 'prometheus'
+
+    # metrics_path defaults to '/metrics'
+    # scheme defaults to 'http'.
+
+#    static_configs:
+#    #- targets: ['192.168.11.73:9090']
+#    - targets: ['192.168.11.73:9100']
+#    - targets: ['192.168.11.53:9100']
+  - job_name: 'consul-prometheus'
+    consul_sd_configs:
+      - server: '{{consul_server}}:8500'
+      - services: ['node-exporter']
+
+    relabel_configs:
+    - source_labels:  ["__meta_consul_dc"]
+      regex: "(.*)"
+      replacement: $1
+      action: replace
+      target_label: "dc"
+    - source_labels: ["__meta_consul_tags"]
+      regex: "(.*)"
+      replacement: $1
+      action: replace
+      target_label: "env"
+    - source_labels: ["__meta_consul_address"]
+      regex: "(.*)"
+      replacement: $1
+      action: replace
+      target_label: "ip"
+    - source_labels: ["__meta_consul_service_id"]
+      regex: "(.*)"
+      replacement: $1
+      action: replace
+      target_label: "exporter_type"
+    - source_labels: ["__meta_consul_tags"]
+      regex: ".*,(sit|test|dev|prod),.*"
+      action: keep
+    - source_labels: ["__meta_consul_service"]
+      regex: "(.*)"
+      replacement: $1
+      action: replace
+      target_label: "service_type"

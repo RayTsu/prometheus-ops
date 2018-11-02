@@ -1,0 +1,17 @@
+[Unit]
+Description=Prometheus Alertmanager
+After=network.target
+
+[Service]
+Type=simple
+PIDFile=/var/run/alertmanager.pid
+ExecReload=/bin/kill -HUP $MAINPID
+ExecStart=/app/alertmanager_dir/alertmanager \
+    --config.file=/app/alertmanager_dir/alertmanager.yml \
+    --storage.path=/app/alertmanager_dir/alertmanager_db
+
+SyslogIdentifier=alertmanager
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,10 @@
+[Unit]
+Description=node_exporter - Exporter for machine metrics
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/app/node_exporter_dir/node_exporter
+
+[Install]
+WantedBy=multi-user.target

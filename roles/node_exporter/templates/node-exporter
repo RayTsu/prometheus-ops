@@ -1,0 +1,48 @@
+#chkconfig: - 85 15
+#description: node-exporter is a service to start node_exporter
+
+#!/bin/sh
+NODE_EXPORTER_PATH=/app/node_exporter_dir
+start() {
+  echo "Starting node_exporter"
+  nohup $NODE_EXPORTER_PATH/node_exporter >$NODE_EXPORTER_PATH/node_exporter.log 2>&1 & 
+}
+stop() {
+  local PID
+  echo "Stopping node_exporter"
+  PID=$(ps -ef|grep node_exporter|grep -v grep|awk '{print $2}')
+  kill -9 $PID
+  echo "$PID killed"
+}
+status() {
+ status_count=`ps -ef|grep node_exporter|grep -v grep|wc -l`
+ if [[ $status_count -eq 1 || $status_count -gt 1 ]];then
+  echo "node_exporter is running"
+  exit 0
+ else
+  echo "node_exporter is not running"  
+ fi
+}
+usage() {
+  echo "Usage: $(basename $0) start|status|stop|restart"
+}
+case "$1" in
+  start)
+ start
+  ;;
+  stop)
+ stop
+  ;;
+  restart)
+ stop
+ sleep 5
+ start
+  ;;
+  status)
+ status
+  ;;
+  *)
+ usage && exit 1
+    ;;
+esac    
+

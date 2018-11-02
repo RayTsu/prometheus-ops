@@ -1,0 +1,15 @@
+{  
+  "service":{  
+    "id": "node-exporter",  
+    "name": "{{name}}",
+    "address": "{{node_ip}}",
+    "port": 9100,  
+    "tags": ["{{env}}"],
+    "checks": [  
+        {  
+            "http": "http://{{node_ip}}:9100",
+            "interval": "5s"  
+        }  
+    ]  
+  }  
+}

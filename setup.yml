@@ -1,0 +1,22 @@
+# 请按照以下顺序安装
+# 安装node_exporter
+- hosts:
+  - nginx
+  - ansible-server
+  - jenkins-master
+  - jenkins-slave
+  tags:
+  - install_node_exporter
+  roles:
+  - node_exporter
+
+# 安装consul_agent
+- hosts:
+  - nginx
+  - ansible-server
+  - jenkins-master
+  - jenkins-slave
+  tags:
+  - install_consul_agent
+  roles:
+  - consul_agent

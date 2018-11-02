@@ -1,0 +1,16 @@
+[Unit]
+Description=Prometheus server
+Requires=network-online.target
+After=network-online.target
+
+[Service]
+Type=simple
+PIDFile=/var/run/prometheus_server.pid
+ExecReload=/bin/kill -HUP $MAINPID
+ExecStart=/app/prometheus_dir/prometheus \
+    --storage.tsdb.retention=168h \
+    --storage.tsdb.path=/app/prometheus_dir/prometheus_db \
+    --config.file=/app/prometheus_dir/prometheus.yml
+
+[Install]
+WantedBy=multi-user.target

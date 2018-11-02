@@ -1,0 +1,27 @@
+# install consul_server on centos
+
+- name: mkdir dir /app if not exists
+  file: name=/app state=directory
+
+- name: transfer consul_1.3.0_linux_amd64.zip to dest server
+  copy: src=/test/Prometheus/consul_1.3.0_linux_amd64.zip dest=/app
+
+- name: unarchive consul_1.3.0_linux_amd64.zip
+  shell: |
+          cd /app
+          unzip consul_1.3.0_linux_amd64.zip
+
+- name: prepare consul related dir
+  shell: |
+          cd /app
+          mkdir -p consul_dir consul/consul_data consul_dir/consul.d
+          mv consul consul_dir/
+
+- name: transfer node-exporter.json to consul.d/
+  template: src=node-exporter.json dest=/app/consul_dir/consul.d
+
+- name: transfer consul_server.service to dest server
+  template: src=consul_server.service dest=/etc/systemd/system
+
+- name: start consul_server service and enable auto start
+  shell: systemctl daemon-reload; systemctl start consul_server.service; systemctl enable consul_server.service

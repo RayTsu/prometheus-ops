@@ -1,0 +1,10 @@
+[Unit]
+Description=consul server - Manage Service Discovery And Service Registry
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/app/consul_dir/consul agent -ui -server -bootstrap -node=consul-server -data-dir=/app/consul_dir/consul_data -config-dir=/app/consul_dir/consul.d -client=0.0.0.0 -datacenter=hemei
+
+[Install]
+WantedBy=multi-user.target
